@@ -5,7 +5,7 @@
 1.  aefead2207ef7e2aa5dc81a34aedf0cad4c32545
     Update CHANGELOG.md
 
-2.  
+2.  коммит 85024d3 не существует
 
 3.  Два
     56cd7859e05c36c06b56d013b55a252d0bb7e158 
