@@ -99,84 +99,21 @@ ad@localhost's password:
 /dev/pts/5
 Connection to localhost closed.
 
-13. НЕ ПЕРЕХВАТЫВАЕТ(((
+13. Исправлено!
 
-ad@ad:/home$ ps -a
+vagrant@vagrant:~$ ps -a
     PID TTY          TIME CMD
-   5604 pts/5    00:00:00 ping
-   5645 pts/6    00:00:00 ps
-ad@ad:/home$ reptyr 5604
-Unable to attach to pid 5604: Operation not permitted
-The kernel denied permission while attaching. If your uid matches
-the target's, check the value of /proc/sys/kernel/yama/ptrace_scope.
-For more information, see /etc/sysctl.d/10-ptrace.conf
-ad@ad:/home$ sudo reptyr 5604
-[-] Unable to open the tty in the child.
-Unable to attach to pid 5604: Permission denied
-ad@ad:/home$ sudo reptyr -T 5604
-Unable to attach to pid 5604: Permission denied
-ad@ad:/home$ cat /etc/sysctl.d/10-ptrace.conf
-# The PTRACE system is used for debugging.  With it, a single user process
-# can attach to any other dumpable process owned by the same user.  In the
-# case of malicious software, it is possible to use PTRACE to access
-# credentials that exist in memory (re-using existing SSH connections,
-# extracting GPG agent information, etc).
-#
-# A PTRACE scope of "0" is the more permissive mode.  A scope of "1" limits
-# PTRACE only to direct child processes (e.g. "gdb name-of-program" and
-# "strace -f name-of-program" work, but gdb's "attach" and "strace -fp $PID"
-# do not).  The PTRACE scope is ignored when a user has CAP_SYS_PTRACE, so
-# "sudo strace -fp $PID" will work as before.  For more details see:
-# https://wiki.ubuntu.com/SecurityTeam/Roadmap/KernelHardening#ptrace
-#
-# For applications launching crash handlers that need PTRACE, exceptions can
-# be registered by the debugee by declaring in the segfault handler
-# specifically which process will be using PTRACE on the debugee:
-#   prctl(PR_SET_PTRACER, debugger_pid, 0, 0, 0);
-#
-# In general, PTRACE is not needed for the average running Ubuntu system.
-# To that end, the default is to set the PTRACE scope to "1".  This value
-# may not be appropriate for developers or servers with only admin accounts.
-kernel.yama.ptrace_scope = 1
-
-Правлю /etc/sysctl.d/10-ptrace.conf kernel.yama.ptrace_scope = 1 на 0
-Перезагрузка
-
-ad@ad:/home$ ps -a
+   1149 pts/0    00:00:00 ps
+vagrant@vagrant:~$ ps -a
     PID TTY          TIME CMD
-   3344 pts/8    00:00:00 ping
-   3379 pts/4    00:00:00 ps
-ad@ad:/home$ reptyr 3344
-Unable to attach to pid 3344: Operation not permitted
-ad@ad:/home$ sudo reptyr 3344
-[sudo] password for ad: 
-[-] Unable to open the tty in the child.
-Unable to attach to pid 3344: Permission denied
-ad@ad:/home$ sudo reptyr -T 3344
-Unable to attach to pid 3344: Permission denied
-ad@ad:/home$ cat /etc/sysctl.d/10-ptrace.conf
-# The PTRACE system is used for debugging.  With it, a single user process
-# can attach to any other dumpable process owned by the same user.  In the
-# case of malicious software, it is possible to use PTRACE to access
-# credentials that exist in memory (re-using existing SSH connections,
-# extracting GPG agent information, etc).
-#
-# A PTRACE scope of "0" is the more permissive mode.  A scope of "1" limits
-# PTRACE only to direct child processes (e.g. "gdb name-of-program" and
-# "strace -f name-of-program" work, but gdb's "attach" and "strace -fp $PID"
-# do not).  The PTRACE scope is ignored when a user has CAP_SYS_PTRACE, so
-# "sudo strace -fp $PID" will work as before.  For more details see:
-# https://wiki.ubuntu.com/SecurityTeam/Roadmap/KernelHardening#ptrace
-#
-# For applications launching crash handlers that need PTRACE, exceptions can
-# be registered by the debugee by declaring in the segfault handler
-# specifically which process will be using PTRACE on the debugee:
-#   prctl(PR_SET_PTRACER, debugger_pid, 0, 0, 0);
-#
-# In general, PTRACE is not needed for the average running Ubuntu system.
-# To that end, the default is to set the PTRACE scope to "1".  This value
-# may not be appropriate for developers or servers with only admin accounts.
-kernel.yama.ptrace_scope = 0
+   1150 pts/1    00:00:00 top
+   1151 pts/0    00:00:00 ps
+vagrant@vagrant:~$ reptyr 1150
+
+```
+![](image2.png)
+
+```
 
 14. tee делает вывод одновременно и в файл в параметре и в stdout. 
 В примере команда получает вывод из stdin, перенаправленный через pipe от stdout команды echo, а так как команда запущена от sudo , соотвественно имеет права на запись в файл.
