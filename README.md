@@ -1,121 +1,60 @@
 # devops-netology
 ## Домашнее задание к занятию "3.2. Работа в терминале, лекция 2"
 ```
-1.  Встроенная.
-    type cd
-    cd is a shell builtin
+1.  chdir("/tmp") - системный вызов, который относится именно к cd.
 
-2. ad@ad:~$ cat testfile
-qwertyuiop[]
-1234567890
-zxcvbnm,./
-ghrhdfhdgjrw
-asdfghjkl;
-qethjtjhtqjrywj
-ad@ad:~$ grep qwerty testfile -c
-1
+2. База данных file находится по пути "/usr/share/misc/magic.mgc" (строка: "openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3")
 
-3. systemd(1)
-ad@ad:~$ pstree -p
-systemd(1)─┬─accounts-daemon(668)─┬─{accounts-daemon}(698)
-           │                      └─{accounts-daemon}(724)
-           ├─agetty(704)
-           ├─atd(696)
-           ├─containerd(697)─┬─{containerd}(736)
-           │                 ├─{containerd}(737)
-           │                 ├─{containerd}(738)
-           │                 ├─{containerd}(739)
-           │                 ├─{containerd}(740)
-           │                 ├─{containerd}(754)
-           │                 ├─{containerd}(755)
-           │                 ├─{containerd}(756)
-           │                 ├─{containerd}(757)
-           │                 ├─{containerd}(759)
-           │                 └─{containerd}(1258)
+3. Первый терминал:
+ad@ad:~$ vi 123
+   Редактируется, сохраняется.
+   Второй терминал:
+root@ad:/home/ad# pgrep vi
+364947
+root@ad:/home/ad# lsof -p 364947 | grep 123
+vi      364947   ad    4u   REG  253,0    12288  786990 /home/ad/.123.swp
+root@ad:/home/ad# rm -f /home/ad/.123.swp
+root@ad:/home/ad# lsof -p 364947 | grep 123
+vi      364947   ad    4u   REG  253,0    12288  786990 /home/ad/.123.swp (deleted)
+root@ad:/home/ad# echo '' >/proc/364947/fd/4
+root@ad:/home/ad# lsof -p 364947 | grep 123
+vi      364947   ad    4u   REG  253,0        1  786990 /home/ad/.123.swp (deleted)
+   В первом терминале файл редактируется в редакторе, сохраняется.
+   Второй терминал:
+root@ad:/home/ad# lsof -p 364947 | grep 123
+vi      364947   ad    4u   REG  253,0        1  786990 /home/ad/.123.swp (deleted)
 
-4. ad@docker:~$ ls -l \root 2>/dev/tty3
+4. Зомби не занимают памяти (как процессы-сироты), но блокируют записи в таблице процессов. 
 
-```
+5. root@ad:/home/ad# dpkg -L bpfcc-tools | grep sbin/opensnoop
+/usr/sbin/opensnoop-bpfcc
+root@ad:/home/ad# /usr/sbin/opensnoop-bpfcc -d 1
+PID    COMM               FD ERR PATH
+2459   redis-server       13   0 /proc/290/stat
+332176 node               19   0 /proc/341997/cmdline
+2459   redis-server       13   0 /proc/290/stat
+342002 sh                  3   0 /etc/ld.so.cache
+342002 sh                  3   0 /lib/x86_64-linux-gnu/libc.so.6
+342003 which               3   0 /etc/ld.so.cache
+342003 which               3   0 /lib/x86_64-linux-gnu/libc.so.6
+342003 which               3   0 /usr/bin/which
+342004 sh                  3   0 /etc/ld.so.cache
+342004 sh                  3   0 /lib/x86_64-linux-gnu/libc.so.6
+342005 ps                  3   0 /etc/ld.so.cache
 
-![](image1.png)
+6. Используется системный вызов "uname()".
+   Part of the utsname information is also accessible via proc/sys/kernel/{ostype, hostname, osrelease, version domainname}.
 
-```
+7. ; - разделитель команд, а && -  условный оператор. Соответственно, в "test -d /tmp/some_dir && echo Hi" echo сработает только в случае успешного завершения test.
+   Смысла использовать в bash && с set -e, на мой взгляд нет, т.к. set -e прерывает работу сценария при появлении первой же ошибки (когда команда возвращает ненулевой код завершения), соответственно, при ошибке выполнение команд прекратится.
 
-5. ad@ad:~$ cat testfile
-qwertyuiop[]
-1234567890
-zxcvbnm,./
-ghrhdfhdgjrw
-asdfghjkl;
-qethjtjhtqjrywj
-ad@ad:~$ cat testfile1
-cat: testfile1: No such file or directory
-ad@ad:~$ cat <testfile >testfile1
-ad@ad:~$ cat testfile1
-qwertyuiop[]
-1234567890
-zxcvbnm,./
-ghrhdfhdgjrw
-asdfghjkl;
-qethjtjhtqjrywj
+8. Параметры:
+-e - Прерывает работу сценария при появлении первой же ошибки (когда команда возвращает ненулевой код завершения).
+-x - Выводит команды со всеми развернутыми подстановками и вычислениями.
+-u - При попытке обращения к неопределенным переменным, выдает сообщение об ошибке и прерывает работу сценария.
+-o pipefile - прекращает выполнение скрипта, даже если хоть одна из частей пайпа завершилась ошибкой. В этом случае bash-скрипт завершит выполнение, даже не смотря на true в конце пайплайна.
+  Незаменим при отладке и логгировании, считается хорошим тоном при написании bash-скриптом.
 
-
-
-6. ad@docker:~$ tty
-/dev/pts/4
-ad@docker:~$ echo pts4 >/dev/tty3
-
-```
-
-![](image.png)
-
-```
-
-7. ad@ad:~$ bash 5>&1 Создаст дескриптор 5 и перенаправит его в stdout
-ad@ad:~$ echo netology > /proc/$$/fd/5 выведет netology в дескриптор 5
-
-8. ad@ad:~$ ls -l /root 3>&1 1>&2 2>&3 |grep denied -c
-1
-
-9. Выводит переменные окружения. Аналоги env, printenv
-
-10. /proc/[pid]/cmdline
-              This read-only file holds the complete command line for the process, unless the process is a zombie.
-Этот файл содержит полную командную строку запуска процесса, кроме тез, что превратились в зомби (176 строка)
-
-/proc/[pid]/exe
-              Under Linux 2.2 and later, this file is a symbolic link containing the actual pathname of the executed command.
-Это символьной ссылка, содержащая фактическое полное имя выполняемого файла.
-
-11. grep sse /proc/cpuinfo
-SSE 4.2
-
-12. ad@ad:~$ ssh localhost 'tty'
-ad@localhost's password: 
-not a tty
-Интерактивная оболочка не позволяет внутри себя запустить другую интерактивную оболочку, поэтому нежно запустить в псевдо-интерактивном режиме
-ad@ad:~$ ssh -t localhost 'tty'
-ad@localhost's password: 
-/dev/pts/5
-Connection to localhost closed.
-
-13. Исправлено!
-
-vagrant@vagrant:~$ ps -a
-    PID TTY          TIME CMD
-   1149 pts/0    00:00:00 ps
-vagrant@vagrant:~$ ps -a
-    PID TTY          TIME CMD
-   1150 pts/1    00:00:00 top
-   1151 pts/0    00:00:00 ps
-vagrant@vagrant:~$ reptyr 1150
-
-```
-![](image2.png)
-
-```
-
-14. tee делает вывод одновременно и в файл в параметре и в stdout. 
-В примере команда получает вывод из stdin, перенаправленный через pipe от stdout команды echo, а так как команда запущена от sudo , соотвественно имеет права на запись в файл.
+9. У себя встретил только S - процесс ожидает (т.е. спит менее 20 секунд) и I - процесс бездействует (т.е. спит больше 20 секунд), без параметров или с оными, указывающими на приоритет и прочие характеристики.
 
 ```
