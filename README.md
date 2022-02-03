@@ -1,60 +1,224 @@
 # devops-netology
-## Домашнее задание к занятию "3.2. Работа в терминале, лекция 2"
+## Домашнее задание к занятию "3.4. Операционные системы, лекция 2"
 ```
-1.  chdir("/tmp") - системный вызов, который относится именно к cd.
+1. vagrant@vagrant:~$ cat /etc/systemd/system/node_exporter.service
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
 
-2. База данных file находится по пути "/usr/share/misc/magic.mgc" (строка: "openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3")
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+EnvironmentFile=/etc/default/node_exporter
 
-3. Первый терминал:
-ad@ad:~$ vi 123
-   Редактирую, сохраняю, не закрываю.
-   Второй терминал:
-root@ad:/home/ad# pgrep vi
-364947
-root@ad:/home/ad# lsof -p 364947 | grep 123
-vi      364947   ad    4u   REG  253,0    12288  786990 /home/ad/.123.swp
-root@ad:/home/ad# rm -f /home/ad/.123.swp
-root@ad:/home/ad# lsof -p 364947 | grep 123
-vi      364947   ad    4u   REG  253,0    12288  786990 /home/ad/.123.swp (deleted)
-root@ad:/home/ad# echo '' >/proc/364947/fd/4
-root@ad:/home/ad# lsof -p 364947 | grep 123
-vi      364947   ad    4u   REG  253,0        1  786990 /home/ad/.123.swp (deleted)
-   В первом терминале файл редактирую в редакторе, сохраняю.
-   Второй терминал:
-root@ad:/home/ad# lsof -p 364947 | grep 123
-vi      364947   ad    4u   REG  253,0        1  786990 /home/ad/.123.swp (deleted)
+[Install]
+WantedBy=multi-user.target
 
-4. Зомби не занимают памяти (как процессы-сироты), но блокируют записи в таблице процессов. 
+vagrant@vagrant:~$ sudo systemctl daemon-reload
+vagrant@vagrant:~$ sudo systemctl enable --now node_exporter
+vagrant@vagrant:~$ sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2022-02-02 19:20:26 UTC; 2s ago
+   Main PID: 1314 (node_exporter)
+      Tasks: 4 (limit: 1071)
+     Memory: 2.4M
+     CGroup: /system.slice/node_exporter.service
+             └─1314 /usr/local/bin/node_exporter
 
-5. root@ad:/home/ad# dpkg -L bpfcc-tools | grep sbin/opensnoop
-/usr/sbin/opensnoop-bpfcc
-root@ad:/home/ad# /usr/sbin/opensnoop-bpfcc -d 1
-PID    COMM               FD ERR PATH
-2459   redis-server       13   0 /proc/290/stat
-332176 node               19   0 /proc/341997/cmdline
-2459   redis-server       13   0 /proc/290/stat
-342002 sh                  3   0 /etc/ld.so.cache
-342002 sh                  3   0 /lib/x86_64-linux-gnu/libc.so.6
-342003 which               3   0 /etc/ld.so.cache
-342003 which               3   0 /lib/x86_64-linux-gnu/libc.so.6
-342003 which               3   0 /usr/bin/which
-342004 sh                  3   0 /etc/ld.so.cache
-342004 sh                  3   0 /lib/x86_64-linux-gnu/libc.so.6
-342005 ps                  3   0 /etc/ld.so.cache
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:199 level=info msg="Li>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.725Z caller=tls_config.go:195 level=info msg="TLS i>
 
-6. Используется системный вызов "uname()".
-   Part of the utsname information is also accessible via proc/sys/kernel/{ostype, hostname, osrelease, version domainname}.
+vagrant@vagrant:~$ sudo systemctl disable --now node_exporter
+Removed /etc/systemd/system/multi-user.target.wants/node_exporter.service.
+vagrant@vagrant:~$ sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
 
-7. ; - разделитель команд, а && -  условный оператор. Соответственно, в "test -d /tmp/some_dir && echo Hi" echo сработает только в случае успешного завершения test.
-   Смысла использовать в bash && с set -e, на мой взгляд нет, т.к. set -e прерывает работу сценария при появлении первой же ошибки (когда команда возвращает ненулевой код завершения), соответственно, при ошибке выполнение команд прекратится.
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:199 level=info msg="Li>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.725Z caller=tls_config.go:195 level=info msg="TLS i>
+Feb 02 19:21:00 vagrant systemd[1]: Stopping Node Exporter...
+Feb 02 19:21:00 vagrant systemd[1]: node_exporter.service: Succeeded.
+Feb 02 19:21:00 vagrant systemd[1]: Stopped Node Exporter.
+...skipping...
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
 
-8. Параметры:
--e - Прерывает работу сценария при появлении первой же ошибки (когда команда возвращает ненулевой код завершения).
--x - Выводит команды со всеми развернутыми подстановками и вычислениями.
--u - При попытке обращения к неопределенным переменным, выдает сообщение об ошибке и прерывает работу сценария.
--o pipefile - прекращает выполнение скрипта, даже если хоть одна из частей пайпа завершилась ошибкой. В этом случае bash-скрипт завершит выполнение, даже не смотря на true в конце пайплайна.
-  Незаменим при отладке и логгировании, считается хорошим тоном при написании bash-скриптом.
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.724Z caller=node_exporter.go:199 level=info msg="Li>
+Feb 02 19:20:26 vagrant node_exporter[1314]: ts=2022-02-02T19:20:26.725Z caller=tls_config.go:195 level=info msg="TLS i>
+Feb 02 19:21:00 vagrant systemd[1]: Stopping Node Exporter...
+Feb 02 19:21:00 vagrant systemd[1]: node_exporter.service: Succeeded.
+Feb 02 19:21:00 vagrant systemd[1]: Stopped Node Exporter.
+~
+~
 
-9. У себя встретил только S - процесс ожидает (т.е. спит менее 20 секунд) и I - процесс бездействует (т.е. спит больше 20 секунд), без параметров или с оными, указывающими на приоритет и прочие характеристики.
+vagrant@vagrant:~$ sudo systemctl enable --now node_exporter
+Created symlink /etc/systemd/system/multi-user.target.wants/node_exporter.service → /etc/systemd/system/node_exporter.service.
+vagrant@vagrant:~$ sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2022-02-02 19:21:12 UTC; 3s ago
+   Main PID: 1392 (node_exporter)
+      Tasks: 4 (limit: 1071)
+     Memory: 2.3M
+     CGroup: /system.slice/node_exporter.service
+             └─1392 /usr/local/bin/node_exporter
+
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.061Z caller=node_exporter.go:199 level=info msg="Li>
+Feb 02 19:21:12 vagrant node_exporter[1392]: ts=2022-02-02T19:21:12.062Z caller=tls_config.go:195 level=info msg="TLS i>
+vagrant@vagrant:~$ sudo systemctl restart node_exporter
+vagrant@vagrant:~$ sudo systemctl status node_exporter
+● node_exporter.service - Node Exporter
+     Loaded: loaded (/etc/systemd/system/node_exporter.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2022-02-02 19:29:11 UTC; 6s ago
+   Main PID: 1439 (node_exporter)
+      Tasks: 4 (limit: 1071)
+     Memory: 2.4M
+     CGroup: /system.slice/node_exporter.service
+             └─1439 /usr/local/bin/node_exporter
+
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:115 level=info collect>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=node_exporter.go:199 level=info msg="Li>
+Feb 02 19:29:11 vagrant node_exporter[1439]: ts=2022-02-02T19:29:11.926Z caller=tls_config.go:195 level=info msg="TLS i>
+
+Открываем 9100 порт наружу
+
+```
+![alt text](Image_1.png)
+
+```
+
+
+2. CPU, для каждого процессора
+node_cpu_seconds_total{cpu="0",mode="idle"} 210.55
+node_cpu_seconds_total{cpu="0",mode="system"} 1.25
+node_cpu_seconds_total{cpu="0",mode="user"} 0.8
+
+    Memory
+node_memory_MemAvailable_bytes gauge
+node_memory_MemFree_bytes gauge
+
+   HDD, для каждого
+node_disk_io_time_seconds_total counter
+node_disk_read_time_seconds_total counter
+node_disk_write_time_seconds_total counter
+    
+    Network, для каждого адаптера
+node_network_receive_errs_total counter
+
+
+3. vagrant@vagrant:~$ curl -s https://packagecloud.io/install/repositories/netdata/netdata/script.deb.sh | sudo bash
+
+vagrant@vagrant:~$ sudo apt install -y netdata
+
+vagrant@vagrant:~$ sudo netdata -p 19999
+Без явного указания порта проброс не работает
+
+```
+![alt text](Image_2.png)
+
+```
+
+4. Не явно, и на чистом железе проверить не могу, к сожалению.
+VirtualBox явно говорит, что виртуальная:
+vagrant@vagrant:~$ dmesg |grep virtual
+[    0.002303] CPU MTRRs all blank - virtualized system.
+[    0.074177] Booting paravirtualized kernel on KVM
+[    2.521502] systemd[1]: Detected virtualization oracle. 
+Но на ProxMox тишина:
+ad@docker2:~$ dmesg |grep virtual
+ad@docker2:~$ 
+
+
+5. vagrant@vagrant:~$ sysctl fs.nr_open
+fs.nr_open = 1048576
+Аналогично
+vagrant@vagrant:~$ sudo cat /proc/sys/fs/nr_open
+1048576
+   Это максимальное число открытых дескрипторов на процесс.
+   Максимальное число дескрипторов на систему можно посмотреть так:
+vagrant@vagrant:~$ cat /proc/sys/fs/file-max
+9223372036854775807
+   Или
+vagrant@vagrant:~$ sysctl fs.file-max
+fs.file-max = 9223372036854775807
+
+vagrant@vagrant:~$ ulimit -Sn
+1024
+   Мягкий лимит (так же ulimit -n) на пользователя, может быть увеличен в процессе работы.
+
+vagrant@vagrant:~$ ulimit -Hn
+1048576
+   Жесткий лимит на пользователя, не может быть увеличен, только уменьшен. 
+   Оба ulimit -n не могут превысить /proc/sys/fs/nr_open.
+
+
+6. vagrant@vagrant:~$ sudo su
+root@vagrant:/home/vagrant# unshare --pid --fork --mount /bin/bash
+root@vagrant:/home/vagrant# ps
+    PID TTY          TIME CMD
+  17063 pts/0    00:00:00 sudo
+  17065 pts/0    00:00:00 su
+  17066 pts/0    00:00:00 bash
+  17073 pts/0    00:00:00 unshare
+  17074 pts/0    00:00:00 bash
+  17081 pts/0    00:00:00 ps
+root@vagrant:/home/vagrant# mount -t proc proc /proc
+root@vagrant:/home/vagrant# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.4   9836  4088 pts/0    S    08:27   0:00 /bin/bash
+root          12  0.0  0.4   9836  4168 tty1     S+   08:31   0:00 -bash
+root          23  0.0  0.3  11492  3292 pts/0    R+   08:33   0:00 ps aux
+
+Результат:
+```
+![alt text](Image_3.png)
+
+```
+
+7. Это так называемая fork-bomb (вилочная бомба), В ней функция определяется, как вызывающая сама себя, а затем передает свой результат в фоновое задание самой себе и так многократно, в идеале - бесконечный цикл))).
+
+[ 3467.424617] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-2.scope
+[ 3483.633178] cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-4.scope
+
+Поскольку режим работы форк-бомбы полностью инкапсулирован путем создания новых процессов, предотвратить серьезное влияние форк-бомбы на всю систему — ограничить максимальное количество процессов, которыми может владеть один пользователь: ulimit -u 50 ограничит этого пользователя пятьюдесятью процессами.
 
 ```
