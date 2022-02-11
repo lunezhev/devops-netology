@@ -1,6 +1,38 @@
 # devops-netology
 ## Домашнее задание к занятию "3.4. Операционные системы, лекция 2"
 ```
+UPD
+"Задание 1
+Предлагаю уточнить как именно в службу будут передаваться дополнительные опции. Примеры можно посмотреть вот здесь:
+www.freedesktop.org...ExecStart=
+unix.stackexchange.com...unit-files
+stackoverflow.com...-unit-file
+Замечу, что речь идёт не о переменных окружения, а об опциях (параметрах) запуска службы.
+
+С уважением,
+Алексей."
+
+Если правильно понял уточнение, то, на примере:
+
+root@docker2:~# systemctl cat cron
+# /etc/systemd/system/cron.service
+[Unit]
+Description=Regular background program processing daemon
+Documentation=man:cron(8)
+After=remote-fs.target nss-user-lookup.target
+
+[Service]
+EnvironmentFile=-/etc/default/cron
+ExecStart=/usr/sbin/cron -f $EXTRA_OPTS
+IgnoreSIGPIPE=false
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+Таковым параметром, например, является параметр перезапуска службы Restart=on-failure, служба будет перезапускаться "при любом чихе)))"
+
 1. vagrant@vagrant:~$ cat /etc/systemd/system/node_exporter.service
 [Unit]
 Description=Node Exporter
