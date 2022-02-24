@@ -151,5 +151,45 @@ tcpdump: listening on ens18, link-type EN10MB (Ethernet), capture size 262144 by
 ![](3.9-7.jpg)
 
 ```
+```
+## Домашнее задание к занятию "4.1. Командная оболочка Bash: Практические навыки"
+
+```
+1. 
+c = a+b, Это текст
+d = 1+2, Значения переменных получены, но без сложения, т.к. это строка
+e = 3, Сложение выполнено
+
+2. Не хватает закрывающей скобки в конце первой строки и проверки успешности для завершения цикла. Для уменьшения размера файла можно задать тайматут выолнения проверки, например в 1 минуту.
+
+#!/bin/bash
+while (( 1 == 1 ))
+  do
+    curl https://localhost:4757
+    if (($? != 0)) 
+      then
+        date >> curl.log
+      else break
+    fi
+    sleep 1m
+  done
+
+
+3. 
+#!/bin/bash
+
+hosts=(192.168.0.1 173.194.222.113 87.250.250.242))
+for h in ${hosts[@]} 
+  do
+  result=$(ping -c 2 -W  1 -q  $h | grep transmitted)
+  pattern="0 received";
+  if [[ $result =~ $pattern ]]; then
+    echo "$h is down"
+  else
+    echo "$h is up"
+  fi
+done
+
+4.
 
 ```
