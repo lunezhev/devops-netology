@@ -177,19 +177,40 @@ while (( 1 == 1 ))
 
 3. 
 #!/bin/bash
-
-hosts=(192.168.0.1 173.194.222.113 87.250.250.242))
-for h in ${hosts[@]} 
-  do
-  result=$(ping -c 2 -W  1 -q  $h | grep transmitted)
-  pattern="0 received";
-  if [[ $result =~ $pattern ]]; then
-    echo "$h is down"
-  else
-    echo "$h is up"
-  fi
+hosts=(192.168.0.1 173.194.222.113 87.250.250.242)
+for i in 1 2 3 4 5
+do
+  for h in ${hosts[@]}
+    do
+      OUTPUT="$(curl -I -s --connect-timeout 3 $h:80)";
+    	if [ -z "${OUTPUT}" ]
+        then echo "IP" $h:80 unavailable >> hosts.log;
+        else echo "IP" $h:80 available >> hosts.log;
+      fi
+      sleep 1;
+    done
 done
 
 4.
+#!/bin/bash
+hosts=(192.168.0.1 173.194.222.113 87.250.250.242)
+i=0
+while [[ $i -lt 1 ]]
+do
+  for h in ${hosts[@]}
+    do
+      OUTPUT="$(curl -I -s --connect-timeout 3 $h:80)";
+      ((i++));
+      echo $i
+    	if [ -z "${OUTPUT}" ]
+        then 
+          echo "IP" $h:80 unavailable >> error.log; 
+          break;
+        else 
+          ((i--));
+      fi
+      sleep 1;
+    done
+done
 
 ```
