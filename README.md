@@ -212,23 +212,109 @@ do
       sleep 1;
     done
 done
+```
+## Домашнее задание к занятию "4.2. Использование Python для решения типовых DevOps задач"
 
-```
-```
-## Домашнее задание к занятию "4.1. Командная оболочка Bash: Практические навыки"
-
-```
 ```
 1. 
  - Ошибка, т.к. разные типы операндов для сложения, 'int' и 'str'
  - c=str(a)+b
  - c=a+int(b)
 
- 2. 
+2. 
+ Удалил лишние переменную is_change и команду break
 
- 3. 
+#!/usr/bin/env python3
 
- 4. 
- 
+import os
+
+bash_command = ["cd ./devops-netology", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\modified:   ', '')
+        print(prepare_result)
+
+Вывод:
+
+PS D:\Netology> python test.py
+        modified:   README.md
+
+3. 
+#!/usr/bin/env python3
+
+import os
+import sys
+
+cmd = os.getcwd()
+
+if len(sys.argv)>=2:
+    cmd = sys.argv[1]
+bash_command = ["cd "+cmd, "git status 2>&1"]
+
+result_os = os.popen(' && '.join(bash_command)).read()
+
+for result in result_os.split('\n'):
+    if result.find('fatal') != -1:
+        print(cmd+' не является GIT репозиторием')    
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\modified: ', '')
+        print(cmd+prepare_result)
+
+Вывод:
+
+PS D:\Netology> python test2.py D:\netology\devops-netology
+D:\netology\devops-netology     modified:   README.md
+PS D:\Netology> python test2.py
+D:\Netology не является GIT репозиторием
+PS D:\Netology> python test2.py D:\netology\123
+Системе не удается найти указанный путь.
+
+4.
+##!/usr/bin/env python3
+
+import socket
+import time
+import datetime
+
+i = 1
+srv = {'drive.google.com':'0.0.0.0', 'mail.google.com':'0.0.0.0', 'google.com':'0.0.0.0'}
+
+print('*** start script ***')
+print(srv)
+print('********************')
+
+while 1==1 :
+    for host in srv:
+        ip = socket.gethostbyname(host)
+        if ip != srv[host]:
+            print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+srv[host]+' '+ip)
+            srv[host]=ip
+        else:
+            print(host, ': ', srv[host])
+
+#счетчик итераций для отладки, закомментировать для бесконечного цикла 3 строки
+    i+=1 
+    if i >= 5 : 
+        break
+    time.sleep(2)
+
+Вывод:
+PS D:\Netology> python test4.py
+*** start script ***
+{'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
+********************
+2022-02-27 18:37:37 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 74.125.131.194     
+2022-02-27 18:37:37 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 64.233.162.17       
+2022-02-27 18:37:37 [ERROR] google.com IP mistmatch: 0.0.0.0 142.250.150.100
+drive.google.com :  74.125.131.194
+mail.google.com :  64.233.162.17
+google.com :  142.250.150.100   
+drive.google.com :  74.125.131.194
+mail.google.com :  64.233.162.17
+google.com :  142.250.150.100   
+drive.google.com :  74.125.131.194
+mail.google.com :  64.233.162.17
+google.com :  142.250.150.100
 
 ```
