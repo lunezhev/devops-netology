@@ -318,3 +318,65 @@ mail.google.com :  64.233.162.17
 google.com :  142.250.150.100
 
 ```
+
+## Домашнее задание к занятию "4.2. Использование Python для решения типовых DevOps задач"
+
+```
+1. Не хватает трех ковычек в 9 строке, после IP и вокруг 71.78.22.43
+
+{ "info" : "Sample JSON output from our service\t",
+    "elements" :[
+        { "name" : "first",
+        "type" : "server",
+        "ip" : 7175 
+        },
+        { "name" : "second",
+        "type" : "proxy",
+        "ip" : "71.78.22.43"
+        }
+    ]
+}
+
+2. 
+##!/usr/bin/env python3
+
+import socket
+import time
+import datetime
+import json
+import yaml
+
+i = 1
+srv = {'drive.google.com':'0.0.0.0', 'mail.google.com':'0.0.0.0', 'google.com':'0.0.0.0'}
+
+#fpath = "C:\\Users\\Andrew\\AppData\\Local\\Programs\\Python\\Python39\\"
+fpath="./"
+
+print('*** start script ***')
+print(srv)
+print('********************')
+
+
+
+while 1 == 1 :
+    print(i)
+    for host in srv:
+        ip = socket.gethostbyname(host)
+        if ip != srv[host]:
+            with open(fpath+host+".json",'w') as jsf:
+                json_data=json.dumps({host:ip})
+                jsf.write(json_data)
+            print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+srv[host]+' '+ip)
+            srv[host]=ip
+        else:
+            print(host, ': ', srv[host])
+            with open(fpath+host+".json",'w') as jsf:
+               json_data=json.dumps({host:ip})
+               jsf.write(json_data)
+
+#счетчик итераций для отладки, закомментировать для бесконечного цикла 3 строки
+    i+=1 
+    if i >= 5 : 
+        break
+    time.sleep(2)
+```
