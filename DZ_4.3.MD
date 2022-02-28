@@ -30,22 +30,107 @@
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import socket
+import time
+import datetime
+import json
+import yaml
+
+i = 1
+srv = {'drive.google.com':'0.0.0.0', 'mail.google.com':'0.0.0.0', 'google.com':'0.0.0.0'}
+
+fpath="./"
+
+print('*** start script ***')
+print(srv)
+print('********************')
+
+
+
+while 1 == 1 :
+    for host in srv:
+        ip = socket.gethostbyname(host)
+        if ip != srv[host]:
+            with open(fpath+host+".json",'w') as jsf:
+                json_data=json.dumps({host:ip})
+                jsf.write(json_data)
+            with open(fpath+host+".yaml",'w') as ymf:
+                yaml_data= yaml.dump([{host : ip}])
+                ymf.write(yaml_data)
+            print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+srv[host]+' '+ip)
+            srv[host]=ip
+        else:
+            print(host, ': ', srv[host])
+
+
+#счетчик итераций для отладки, закомментировать для бесконечного цикла 3 строки
+    i+=1 
+    if i >= 10 : 
+        break
+    time.sleep(2)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+ad@k8s:~$ python3 test.py
+*** start script ***
+{'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
+********************
+2022-02-28 09:51:16 [ERROR] drive.google.com IP mistmatch: 0.0.0.0 173.194.222.194
+2022-02-28 09:51:16 [ERROR] mail.google.com IP mistmatch: 0.0.0.0 142.251.1.18
+2022-02-28 09:51:16 [ERROR] google.com IP mistmatch: 0.0.0.0 173.194.222.101
+drive.google.com :  173.194.222.194
+mail.google.com :  142.251.1.18
+2022-02-28 09:51:18 [ERROR] google.com IP mistmatch: 173.194.222.101 64.233.163.101
+drive.google.com :  173.194.222.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+2022-02-28 09:51:22 [ERROR] drive.google.com IP mistmatch: 173.194.222.194 74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+drive.google.com :  74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+drive.google.com :  74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+drive.google.com :  74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+drive.google.com :  74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
+drive.google.com :  74.125.131.194
+mail.google.com :  142.251.1.18
+google.com :  64.233.163.101
 ```
 
 ### json-файл(ы), который(е) записал ваш скрипт:
 ```json
-???
+ad@k8s:~$ ls
+drive.google.com.yaml  google.com.yaml       mail.google.com.yaml  test.py
+drive.google.com.json  google.com.json        mail.google.com.json  my_env
+ad@k8s:~$ cat drive.google.com.json
+{"drive.google.com": "74.125.131.194"}
+ad@k8s:~$ cat google.com.json
+{"google.com": "64.233.163.101"}
+ad@k8s:~$ cat mail.google.com.json
+{"mail.google.com": "142.251.1.18"}
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
 ```yaml
-???
+ad@k8s:~$ ls
+drive.google.com.yaml  google.com.yaml       mail.google.com.yaml  test.py
+drive.google.com.json  google.com.json        mail.google.com.json  my_env
+ad@k8s:~$ cat drive.google.com.yaml
+- drive.google.com: 74.125.131.194
+ad@k8s:~$ cat google.com.yaml
+- google.com: 64.233.163.101
+ad@k8s:~$ cat mail.google.com.yaml
+- mail.google.com: 142.251.1.18
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
@@ -60,7 +145,7 @@
 
 ### Ваш скрипт:
 ```python
-???
+
 ```
 
 ### Пример работы скрипта:
