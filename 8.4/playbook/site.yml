@@ -1,11 +1,4 @@
 ---
-- name: clickhouse
-  hosts: clickhouse
-  roles:
-    - clickhouse
-  tags:
-    - clickhouse
-
 - name: lighthouse
   hosts: lighthouse
   roles:
@@ -20,3 +13,9 @@
   tags:
     - vector
     
+- name: clickhouse
+  hosts: clickhouse
+  roles:
+    - clickhouse
+  tags:
+    - clickhouse
