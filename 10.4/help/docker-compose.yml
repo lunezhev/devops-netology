@@ -2,7 +2,7 @@ version: '2.2'
 services:
 
   es-hot:
-    image: elasticsearch:7.11.2
+    image: elasticsearch:7.17.10
     container_name: es-hot
     environment:
       - node.name=es-hot
@@ -28,7 +28,7 @@ services:
       - es-warm
 
   es-warm:
-    image: elasticsearch:7.11.2
+    image: elasticsearch:7.17.10
     container_name: es-warm
     environment:
       - node.name=es-warm
@@ -50,7 +50,7 @@ services:
       - elastic
 
   kibana:
-    image: kibana:7.11.2
+    image: kibana:7.17.10
     container_name: kibana
     ports:
       - 5601:5601
@@ -64,12 +64,12 @@ services:
       - es-warm
 
   logstash:
-    image: logstash:6.4.3
+    image:  logstash:7.17.10
     container_name: logstash
-    expose:
-      - 5046
+    ports:
+      - 5044:5044
     volumes:
-      - ./configs/logstash.conf:/etc/logstash/conf.d/logstash.conf:Z
+      - ./configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:Z
       - ./configs/logstash.yml:/opt/logstash/config/logstash.yml:Z
     networks:
       - elastic
@@ -78,7 +78,7 @@ services:
       - es-warm
 
   filebeat:
-    image: elastic/filebeat:7.11.2
+    image: elastic/filebeat:7.17.10
     container_name: filebeat
     privileged: true
     user: root
@@ -86,10 +86,10 @@ services:
       - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml:Z
       - /var/lib/docker:/var/lib/docker:Z
       - /var/run/docker.sock:/var/run/docker.sock:Z
-    depends_on:
-      - logstash
     networks:
       - elastic
+    depends_on:
+      - logstash
 
   some_application:
     image: library/python:3.9-alpine
