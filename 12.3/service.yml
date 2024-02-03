@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-netology
+spec:
+  selector:
+    app: service-netology
+  ports:
+    - name: nginx
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: multitool-http
+      protocol: TCP
+      port: 1080
+      targetPort: 1080
+    - name: multitool-https
+      protocol: TCP
+      port: 10443
+      targetPort: 10443

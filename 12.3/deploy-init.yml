@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-init
+  labels:
+    app: deploy-init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-init
+  template:
+    metadata:
+      labels:
+        app: deploy-init
+    spec:
+      initContainers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', 'until nslookup service-init.default.svc.cluster.local; do echo waiting for service-init; sleep 2; done;']
+
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80

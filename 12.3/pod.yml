@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multitool-netology
+  labels:
+    app: multitool-netology
+spec:
+  containers:
+  - name: multitool-netology
+    image: wbitt/network-multitool
+    env:
+      - name: HTTP_PORT
+        value: "2080"
+      - name: HTTPS_PORT
+        value: "20443"
+    ports:
+    - containerPort: 2080
+    - containerPort: 20443
