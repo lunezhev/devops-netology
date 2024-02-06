@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-netology
+  labels:
+    app: deploy-net
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: deploy-net
+  template:
+    metadata:
+      labels:
+        app: deploy-net
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+      - name: multitool
+        image: wbitt/network-multitool
+        env:
+          - name: HTTP_PORT
+            value: "8080"
+          - name: HTTPS_PORT
+            value: "10443"
+        ports:
+        - containerPort: 8080
+        - containerPort: 10443
