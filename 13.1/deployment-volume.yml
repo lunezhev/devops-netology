@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-netology-volume
+  labels:
+    app: deploy-vol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-vol
+  template:
+    metadata:
+      labels:
+        app: deploy-vol
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', 'while true; do echo "log -- $(date)" >> /logs/logs.txt; sleep 5; done']
+        volumeMounts:
+          - name: bu-mu
+            mountPath: /logs
+      - name: multitool
+        image: wbitt/network-multitool
+        env:
+          - name: HTTP_PORT
+            value: "8080"
+          - name: HTTPS_PORT
+            value: "10443"
+        ports:
+        - containerPort: 8080
+        - containerPort: 10443
+        volumeMounts:
+          - name: bu-mu
+            mountPath: /logs
+
+      volumes:
+      - name: bu-mu
+        emptyDir: {}
