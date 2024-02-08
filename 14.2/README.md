@@ -26,6 +26,8 @@
 ------
 ### Решение:
 
+Создал три плэйбука, запускал последовательно:
+
 [inventory.ini](./inventory.ini)
 
 [install.yml](./install.yml)
