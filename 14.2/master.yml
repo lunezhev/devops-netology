@@ -1,0 +1,55 @@
+---
+- name: initialize the cluster
+  hosts: masters
+  become: true
+  remote_user: and
+
+  tasks:
+    - name: init the cluster
+      shell: IPAPI=$(ip a | grep -i eth0 | grep -oP 'inet \K[0-9.]+')
+      shell: IPEXT=$(curl -s 2ip.ru)
+      shell: kubeadm init --apiserver-advertise-address="$IPAPI" --pod-network-cidr=10.244.0.0/16 --apiserver-cert-extra-sans="$IPEXT" | awk '/kubeadm join/{print;getline;print}'
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+
+    - name: create .kube directory
+      become: yes
+      become_user: and
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copies admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/and/.kube/config
+        remote_src: yes
+        owner: and
+
+    - name: Get the token for joining the worker nodes
+      become: yes
+      become_user: and
+      shell: kubeadm token create  --print-join-command
+      register: kubernetes_join_command
+
+    - debug:
+        msg: "{{ kubernetes_join_command.stdout }}"
+
+
+
+    - name: Copy join command to local file.
+      copy:
+        content: "{{ kubernetes_join_command.stdout_lines[0] }}"
+        dest: "/tmp/kubernetes_join_command" # 
+        mode: 0777
+      delegate_to: localhost
+
+    - name: install flannel
+      become_user: and
+      become_method: sudo
+      become: yes
+      command: "{{ item }}"
+      with_items:
+        kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml

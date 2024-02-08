@@ -1,0 +1,25 @@
+---
+- name: initialize the cluster
+  hosts: workers
+  become: true
+
+  tasks:
+    - name: Copy join command from Ansiblehost to the worker nodes.
+      become: yes
+      copy:
+        src: /tmp/kubernetes_join_command
+        dest: /tmp/kubernetes_join_command
+        mode: 0777
+
+    - name: kubeadm reset
+      become: yes
+      command: sudo kubeadm reset -f
+    
+    - name:  second pause
+      pause:
+        seconds: 5
+
+    - name: Join the Worker nodes to the cluster.
+      become: yes
+      command: sh /tmp/kubernetes_join_command
+      register: joined_or_not
