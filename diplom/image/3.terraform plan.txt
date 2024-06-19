@@ -1,0 +1,297 @@
+and@k8s:~/Diplom/infra$ terraform plan
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # local_file.inventory will be created
+  + resource "local_file" "inventory" {
+      + content              = (known after apply)
+      + content_base64sha256 = (known after apply)
+      + content_base64sha512 = (known after apply)
+      + content_md5          = (known after apply)
+      + content_sha1         = (known after apply)
+      + content_sha256       = (known after apply)
+      + content_sha512       = (known after apply)
+      + directory_permission = "0777"
+      + file_permission      = "0777"
+      + filename             = "./ansible/kubespray/inventory/mycluster/inventory.ini"
+      + id                   = (known after apply)
+    }
+
+  # null_resource.ansible_provisioner will be created
+  + resource "null_resource" "ansible_provisioner" {
+      + id = (known after apply)
+    }
+
+  # null_resource.gitlab-agent_service will be created
+  + resource "null_resource" "gitlab-agent_service" {
+      + id = (known after apply)
+    }
+
+  # null_resource.grafana_service will be created
+  + resource "null_resource" "grafana_service" {
+      + id = (known after apply)
+    }
+
+  # null_resource.kubeconfig will be created
+  + resource "null_resource" "kubeconfig" {
+      + id = (known after apply)
+    }
+
+  # null_resource.kubeconfig_cp will be created
+  + resource "null_resource" "kubeconfig_cp" {
+      + id = (known after apply)
+    }
+
+  # null_resource.kubespray_init will be created
+  + resource "null_resource" "kubespray_init" {
+      + id = (known after apply)
+    }
+
+  # null_resource.monitoring_deployment will be created
+  + resource "null_resource" "monitoring_deployment" {
+      + id = (known after apply)
+    }
+
+  # null_resource.supplementary_addresses will be created
+  + resource "null_resource" "supplementary_addresses" {
+      + id = (known after apply)
+    }
+
+  # null_resource.timeout_k8s_start_masters will be created
+  + resource "null_resource" "timeout_k8s_start_masters" {
+      + id = (known after apply)
+    }
+
+  # null_resource.timeout_k8s_start_workers will be created
+  + resource "null_resource" "timeout_k8s_start_workers" {
+      + id = (known after apply)
+    }
+
+  # yandex_compute_instance_group.k8s-masters will be created
+  + resource "yandex_compute_instance_group" "k8s-masters" {
+      + created_at          = (known after apply)
+      + deletion_protection = false
+      + folder_id           = (known after apply)
+      + id                  = (known after apply)
+      + instances           = (known after apply)
+      + name                = "k8s-masters"
+      + service_account_id  = "ajekvaavu3gq4ntoqehb"
+      + status              = (known after apply)
+
+      + allocation_policy {
+          + zones = [
+              + "ru-central1-a",
+              + "ru-central1-b",
+              + "ru-central1-d",
+            ]
+        }
+
+      + deploy_policy {
+          + max_creating     = 3
+          + max_deleting     = 3
+          + max_expansion    = 3
+          + max_unavailable  = 3
+          + startup_duration = 0
+          + strategy         = (known after apply)
+        }
+
+      + instance_template {
+          + labels      = (known after apply)
+          + metadata    = {
+              + "ssh-keys" = <<-EOT
+                    and:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOaOiPJwi5+Bj87XxYVIFMdl3bTTmGl1qV46hin+9cn9 and@k8s
+                EOT
+            }
+          + name        = "master-{instance.index}"
+          + platform_id = "standard-v2"
+
+          + boot_disk {
+              + device_name = (known after apply)
+              + mode        = "READ_WRITE"
+
+              + initialize_params {
+                  + image_id    = "fd8vmcue7aajpmeo39kk"
+                  + size        = 10
+                  + snapshot_id = (known after apply)
+                  + type        = "network-ssd"
+                }
+            }
+
+          + network_interface {
+              + ip_address   = (known after apply)
+              + ipv4         = true
+              + ipv6         = (known after apply)
+              + ipv6_address = (known after apply)
+              + nat          = true
+              + network_id   = (known after apply)
+              + subnet_ids   = (known after apply)
+            }
+
+          + network_settings {
+              + type = "STANDARD"
+            }
+
+          + resources {
+              + core_fraction = 20
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = true
+            }
+        }
+
+      + scale_policy {
+          + fixed_scale {
+              + size = 3
+            }
+        }
+    }
+
+  # yandex_compute_instance_group.k8s-workers will be created
+  + resource "yandex_compute_instance_group" "k8s-workers" {
+      + created_at          = (known after apply)
+      + deletion_protection = false
+      + folder_id           = (known after apply)
+      + id                  = (known after apply)
+      + instances           = (known after apply)
+      + name                = "k8s-workers"
+      + service_account_id  = "ajekvaavu3gq4ntoqehb"
+      + status              = (known after apply)
+
+      + allocation_policy {
+          + zones = [
+              + "ru-central1-a",
+              + "ru-central1-b",
+              + "ru-central1-d",
+            ]
+        }
+
+      + deploy_policy {
+          + max_creating     = 3
+          + max_deleting     = 3
+          + max_expansion    = 3
+          + max_unavailable  = 3
+          + startup_duration = 0
+          + strategy         = (known after apply)
+        }
+
+      + instance_template {
+          + labels      = (known after apply)
+          + metadata    = {
+              + "ssh-keys" = <<-EOT
+                    and:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOaOiPJwi5+Bj87XxYVIFMdl3bTTmGl1qV46hin+9cn9 and@k8s
+                EOT
+            }
+          + name        = "worker-{instance.index}"
+          + platform_id = "standard-v2"
+
+          + boot_disk {
+              + device_name = (known after apply)
+              + mode        = "READ_WRITE"
+
+              + initialize_params {
+                  + image_id    = "fd8vmcue7aajpmeo39kk"
+                  + size        = 10
+                  + snapshot_id = (known after apply)
+                  + type        = "network-hdd"
+                }
+            }
+
+          + network_interface {
+              + ip_address   = (known after apply)
+              + ipv4         = true
+              + ipv6         = (known after apply)
+              + ipv6_address = (known after apply)
+              + nat          = true
+              + network_id   = (known after apply)
+              + subnet_ids   = (known after apply)
+            }
+
+          + network_settings {
+              + type = "STANDARD"
+            }
+
+          + resources {
+              + core_fraction = 20
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = true
+            }
+        }
+
+      + scale_policy {
+          + fixed_scale {
+              + size = 3
+            }
+        }
+    }
+
+  # yandex_vpc_network.net will be created
+  + resource "yandex_vpc_network" "net" {
+      + created_at                = (known after apply)
+      + default_security_group_id = (known after apply)
+      + folder_id                 = "b1g63r6cv324nqcitmbp"
+      + id                        = (known after apply)
+      + labels                    = (known after apply)
+      + name                      = "net"
+      + subnet_ids                = (known after apply)
+    }
+
+  # yandex_vpc_subnet.central1-a will be created
+  + resource "yandex_vpc_subnet" "central1-a" {
+      + created_at     = (known after apply)
+      + folder_id      = (known after apply)
+      + id             = (known after apply)
+      + labels         = (known after apply)
+      + name           = "central1-a"
+      + network_id     = (known after apply)
+      + v4_cidr_blocks = [
+          + "10.0.10.0/24",
+        ]
+      + v6_cidr_blocks = (known after apply)
+      + zone           = "ru-central1-a"
+    }
+
+  # yandex_vpc_subnet.central1-b will be created
+  + resource "yandex_vpc_subnet" "central1-b" {
+      + created_at     = (known after apply)
+      + folder_id      = (known after apply)
+      + id             = (known after apply)
+      + labels         = (known after apply)
+      + name           = "central1-b"
+      + network_id     = (known after apply)
+      + v4_cidr_blocks = [
+          + "10.0.20.0/24",
+        ]
+      + v6_cidr_blocks = (known after apply)
+      + zone           = "ru-central1-b"
+    }
+
+  # yandex_vpc_subnet.central1-d will be created
+  + resource "yandex_vpc_subnet" "central1-d" {
+      + created_at     = (known after apply)
+      + folder_id      = (known after apply)
+      + id             = (known after apply)
+      + labels         = (known after apply)
+      + name           = "central1-d"
+      + network_id     = (known after apply)
+      + v4_cidr_blocks = [
+          + "10.0.30.0/24",
+        ]
+      + v6_cidr_blocks = (known after apply)
+      + zone           = "ru-central1-d"
+    }
+
+Plan: 17 to add, 0 to change, 0 to destroy.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't guarantee to take exactly these actions if you run "terraform apply" now.
