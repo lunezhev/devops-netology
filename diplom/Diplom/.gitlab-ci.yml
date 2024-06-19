@@ -1,0 +1,58 @@
+stages:
+  - build
+  - deploy
+
+# Сборка образа контейнера.
+build-job:
+  stage: build
+  tags: 
+    - dind
+# Использование kaniko для создания контейнера внутри контейнера для большей безопасности.
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+
+  before_script:
+#    - echo $CI_REGISTRY_USER
+#    - echo $CI_JOB_TOKEN
+    - echo $CI_REGISTRY
+    - echo $CI_REGISTRY_KEY
+    - echo $CI_PROJECT_DIR
+    - echo $CI_PROJECT_PATH
+#    - echo $CI_PROJECT_NAMESPACE
+#    - echo $REGISTRY_GROUP_PROJECT
+#    - echo $CI_PROJECT_NAME
+#    - echo $MS_NAME
+#    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+
+
+  script:
+    - mkdir -p /kaniko/.docker
+# Отправка образа контейнера в реестр. Образ отмечен хэшем коммита.
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY}/${CI_PROJECT_PATH}:${IMAGE_TAG}"
+    
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY}/${CI_PROJECT_PATH}:latest"
+
+
+deploy:
+  image: bitnami/kubectl:latest
+  stage: deploy
+  tags: 
+    - dind
+  script:
+    - kubectl config get-contexts
+    - kubectl config use-context ${CI_PROJECT_PATH}:diplom
+    - kubectl get pods --namespace diplom
+    - cat k8s.yaml | sed -e "s,__VERSION__,${CI_REGISTRY}/${CI_PROJECT_PATH}:latest," | kubectl apply -f -
+    - kubectl get pods --namespace diplom
+    - kubectl rollout restart deployment/diplom -n diplom
